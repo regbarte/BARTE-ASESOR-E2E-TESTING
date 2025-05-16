@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { TodoPage } from './helpers/todo-page';
 
 const TODO_APP_URL = 'http://localhost:3000';
 
-test.describe('Todo List Functionality using POM', () => {
+test.describe('Todo List Functionality', () => {
   let todoPage: TodoPage;
 
   test.beforeEach(async ({ page }) => {
@@ -11,20 +11,23 @@ test.describe('Todo List Functionality using POM', () => {
     await todoPage.goto();
   });
 
-  test('should add a new basic todo', async () => {
+  test('should add a new basic todo', async ({ page }) => {
     await todoPage.addNewTodo('Study');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Study") label`)).toBeVisible();
+    await expect(page.locator(`#task-:has-text("Study") + label`)).toBeVisible();
   });
 
-  test('should complete a todo', async () => {
+  test('should complete a todo', async ({ page }) => {
     await todoPage.addNewTodo('Code');
-    await todoPage.toggleComplete('Code');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Code")`)).toHaveClass('opacity-60');
+    const checkbox = page.locator(`#task-:has-text("Code")`);
+    await checkbox.check();
+    await expect(checkbox).toBeChecked();
+    await expect(page.locator(`#task-:has-text("Code") + label`)).toHaveClass('line-through');
   });
 
-  test('should delete a todo', async () => {
+  test('should delete a todo', async ({ page }) => {
     await todoPage.addNewTodo('Sleep');
-    await todoPage.deleteTodo('Sleep');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Sleep")`)).toBeHidden();
+    const todoItem = page.locator(`.bg-white:has-text("Sleep")`);
+    await todoItem.locator('button[aria-label="Delete"] svg').click();
+    await expect(todoItem).toBeHidden();
   });
 });

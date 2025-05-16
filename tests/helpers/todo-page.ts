@@ -8,19 +8,17 @@ export class TodoPage {
   }
 
   async addNewTodo(text: string) {
-    await this.page.locator('.new-todo').type(text);
-    await this.page.locator('.new-todo').press('Enter');
+    await this.page.locator('input[placeholder="Enter task title..."]').type(text);
+    await this.page.locator('button:has-text("Add Task")').click();
   }
 
   async toggleComplete(todoText: string) {
-    const todoItem = this.page.locator(`[data-testid="task-card"]:has-text("${todoText}")`);
-    await todoItem.locator('[data-testid="task-checkbox"]').check();
+    const todoItem = this.page.locator(`.bg-white:has-text("${todoText}")`);
+    await todoItem.locator('input[type="checkbox"]').check();
   }
 
   async deleteTodo(todoText: string) {
-    const todoItem = this.page.locator(`[data-testid="task-card"]:has-text("${todoText}")`);
-    await todoItem.hover();
-    await todoItem.locator('[data-testid="delete-button"]').click();
+    const todoItem = this.page.locator(`.bg-white:has-text("${todoText}")`);
+    await todoItem.locator('button svg[data-lucide="trash"]').click();
   }
-
 }
