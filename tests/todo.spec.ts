@@ -13,18 +13,18 @@ test.describe('Todo List Functionality using POM', () => {
 
   test('should add a new basic todo', async () => {
     await todoPage.addNewTodo('Study');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Buy milk") label`)).toBeVisible();
+    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Study") label`)).toBeVisible();
   });
 
   test('should complete a todo', async () => {
     await todoPage.addNewTodo('Code');
     await todoPage.toggleComplete('Code');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Walk the cat")`)).toHaveClass('opacity-60');
+    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Code")`)).toHaveClass('opacity-60');
   });
 
   test('should delete a todo', async () => {
     await todoPage.addNewTodo('Sleep');
     await todoPage.deleteTodo('Sleep');
-    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Clean the house")`)).toBeHidden();
+    await expect(todoPage.page.locator(`[data-testid="task-card"]:has-text("Sleep")`)).toBeHidden();
   });
 });
