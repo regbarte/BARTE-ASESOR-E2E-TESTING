@@ -1,10 +1,10 @@
 import { Page } from '@playwright/test';
 
 export class TodoPage {
-  constructor(public readonly page: Page) {}
+  constructor(public readonly page: Page, private readonly url: string) {} 
 
   async goto() {
-    await this.page.goto('http://localhost:3000');
+    await this.page.goto(this.url);
   }
 
   async addNewTodo(text: string) {

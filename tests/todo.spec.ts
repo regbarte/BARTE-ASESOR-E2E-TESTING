@@ -7,7 +7,7 @@ test.describe('Todo List Functionality', () => {
   let todoPage: TodoPage;
 
   test.beforeEach(async ({ page }) => {
-    todoPage = new TodoPage(page);
+    todoPage = new TodoPage(page, TODO_APP_URL); 
     await todoPage.goto();
   });
 
@@ -27,7 +27,17 @@ test.describe('Todo List Functionality', () => {
   test('should delete a todo', async ({ page }) => {
     await todoPage.addNewTodo('Sleep');
     const todoItem = page.locator(`.bg-white:has-text("Sleep")`);
-    await todoItem.locator('button[aria-label="Delete"] svg').click();
+    await todoItem.locator('button svg[data-lucide="trash"]').click();
     await expect(todoItem).toBeHidden();
+  });
+
+  test('should persist added tasks on page reload', async ({ page }) => {
+    const newTaskTitle = 'Remember groceries';
+    await todoPage.addNewTodo(newTaskTitle);
+    await expect(page.locator(`#task-:has-text("${newTaskTitle}") + label`)).toBeVisible();
+
+    await page.reload();
+
+    await expect(page.locator(`#task-:has-text("${newTaskTitle}") + label`)).toBeVisible({ timeout: 5000 });
   });
 });
