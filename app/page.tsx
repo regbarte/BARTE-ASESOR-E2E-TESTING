@@ -83,7 +83,7 @@ export default function TodoApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
-        <h1 className="text-4xl font-bold text-center text-gray-800">To-Do List Application</h1>
+        <h1 className="text-4xl font-bold text-center text-gray-800">Task Manager</h1>
 
         {/* Task Creation Form */}
         <div className="bg-white p-6 rounded-xl shadow-md">

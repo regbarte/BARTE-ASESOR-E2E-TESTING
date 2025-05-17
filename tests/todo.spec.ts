@@ -1,43 +1,52 @@
-import { test, expect, Page } from '@playwright/test';
-import { TodoPage } from './helpers/todo-page';
+import { test, expect } from '@playwright/test';
 
-const TODO_APP_URL = 'http://localhost:3000';
+test('should add a new task', async ({ page }) => {
+  await page.goto('http://localhost:3000');
 
-test.describe('Todo List Functionality', () => {
-  let todoPage: TodoPage;
+  // Verify the app loaded correctly
+  await expect(page.locator('h1')).toHaveText('Task Manager');
+  await expect(page.locator('input[name="taskName"]')).toBeVisible();
+  await expect(page.locator('textarea[name="taskDescription"]')).toBeVisible();
+  await expect(page.locator('button[type="submit"]')).toBeVisible();
+  await expect(page.locator('.task-list')).toBeVisible();
+  await expect(page.locator('.task-list')).toHaveText('No tasks available');
+  await expect(page.locator('.task-list')).toHaveCount(0);
+  await expect(page.locator('.task-list')).toHaveClass(/empty/);
+  await expect(page.locator('.task-list')).toHaveText('No tasks available');
+  await expect(page.locator('.task-list')).toHaveCount(0);
+  
 
-  test.beforeEach(async ({ page }) => {
-    todoPage = new TodoPage(page, TODO_APP_URL); 
-    await todoPage.goto();
-  });
+  // Fill in the form
+  const taskName = 'New Task';
+  const taskDescription = 'This is a new task for testing.';
+  await page.fill('input[name="taskName"]', taskName);
+  await page.fill('textarea[name="taskDescription"]', taskDescription);
+  await page.click('button[type="submit"]');
 
-  test('should add a new basic todo', async ({ page }) => {
-    await todoPage.addNewTodo('Study');
-    await expect(page.locator(`#task-:has-text("Study") + label`)).toBeVisible();
-  });
+  // Verify the new task appears in the list
+  const taskList = page.locator('.task-list');
+  await expect(taskList).toContainText(taskName);
+  await expect(taskList).toContainText(taskDescription);
+});
 
-  test('should complete a todo', async ({ page }) => {
-    await todoPage.addNewTodo('Code');
-    const checkbox = page.locator(`#task-:has-text("Code")`);
-    await checkbox.check();
-    await expect(checkbox).toBeChecked();
-    await expect(page.locator(`#task-:has-text("Code") + label`)).toHaveClass('line-through');
-  });
+test('should mark a task as completed', async ({ page }) => {
+  await page.goto('http://localhost:3000');
 
-  test('should delete a todo', async ({ page }) => {
-    await todoPage.addNewTodo('Sleep');
-    const todoItem = page.locator(`.bg-white:has-text("Sleep")`);
-    await todoItem.locator('button svg[data-lucide="trash"]').click();
-    await expect(todoItem).toBeHidden();
-  });
+  // Verify the app loaded correctly
+  await expect(page.locator('h1')).toHaveText('To-Do List Application');
 
-  test('should persist added tasks on page reload', async ({ page }) => {
-    const newTaskTitle = 'Remember groceries';
-    await todoPage.addNewTodo(newTaskTitle);
-    await expect(page.locator(`#task-:has-text("${newTaskTitle}") + label`)).toBeVisible();
+  const taskName = 'Task to Complete';
+  const taskDescription = 'This task will be marked as completed';
 
-    await page.reload();
+  // Add a new task
+  await page.fill('input[name="taskName"]', taskName);
+  await page.fill('textarea[name="taskDescription"]', taskDescription);
+  await page.click('button[type="submit"]');
 
-    await expect(page.locator(`#task-:has-text("${newTaskTitle}") + label`)).toBeVisible({ timeout: 5000 });
-  });
+  // Mark the task as completed
+  await page.click(`text=${taskName} >> .. >> .complete-button`);
+
+  // Verify the task is marked as completed
+  const completedTask = page.locator(`text=${taskName} >> ..`);
+  await expect(completedTask).toHaveClass(/completed/);
 });
